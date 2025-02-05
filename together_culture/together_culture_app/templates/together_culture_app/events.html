@@ -1,0 +1,101 @@
+{% extends 'together_culture_app/base.html' %}
+
+{% block title %}Events{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col">
+            <h2>Upcoming Events</h2>
+        </div>
+        {% if user.is_staff %}
+        <div class="col-auto">
+            <a href="{% url 'admin:together_culture_app_event_add' %}" class="btn btn-primary">Create Event</a>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if events %}
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for event in events %}
+                <div class="col">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ event.title }}</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">
+                                {{ event.date|date:"F j, Y, g:i a" }}
+                            </h6>
+                            <p class="card-text">{{ event.description|truncatewords:30 }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="badge bg-info">
+                                    Capacity: <span class="capacity">{{ event.capacity }}</span>
+                                </span>
+                                {% if event.is_digital %}
+                                    <span class="badge bg-primary">Digital Event</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <form class="event-registration-form" data-event-id="{{ event.id }}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success w-100">Register</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            No upcoming events at the moment. Check back later!
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const forms = document.querySelectorAll('.event-registration-form');
+    forms.forEach(form => {
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const eventId = this.dataset.eventId;
+            try {
+                const response = await fetch(`/api/events/${eventId}/register/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    }
+                });
+                if (response.ok) {
+                    const capacityElement = this.closest('.card').querySelector('.capacity');
+                    const currentCapacity = parseInt(capacityElement.textContent);
+                    capacityElement.textContent = currentCapacity - 1;
+                    this.querySelector('button').disabled = true;
+                    this.querySelector('button').textContent = 'Registered';
+                    showAlert('Successfully registered for the event!', 'success');
+                } else {
+                    showAlert('Failed to register for the event.', 'danger');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('An error occurred while registering.', 'danger');
+            }
+        });
+    });
+});
+
+function showAlert(message, type) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    document.querySelector('.container').insertBefore(alertDiv, document.querySelector('.container').firstChild);
+    setTimeout(() => alertDiv.remove(), 5000);
+}
+</script>
+{% endblock %} 

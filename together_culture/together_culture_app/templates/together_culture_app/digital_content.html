@@ -1,0 +1,43 @@
+{% extends 'together_culture_app/base.html' %}
+
+{% block title %}Digital Content{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col">
+            <h2>Digital Content Library</h2>
+        </div>
+        {% if user.is_staff %}
+        <div class="col-auto">
+            <a href="{% url 'admin:together_culture_app_digitalcontent_add' %}" class="btn btn-primary">Add Content</a>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if content %}
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for item in content %}
+                <div class="col">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ item.title }}</h5>
+                            <p class="card-text">{{ item.description|truncatewords:30 }}</p>
+                            <p class="text-muted">Added: {{ item.created_date|date:"F j, Y" }}</p>
+                        </div>
+                        <div class="card-footer">
+                            <a href="{{ item.content_url }}" class="btn btn-primary w-100" target="_blank">
+                                Access Content
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            No digital content available yet. Check back later!
+        </div>
+    {% endif %}
+</div>
+{% endblock %} 

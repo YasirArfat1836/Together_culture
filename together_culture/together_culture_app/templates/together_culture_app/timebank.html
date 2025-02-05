@@ -1,0 +1,111 @@
+{% extends 'together_culture_app/base.html' %}
+
+{% block title %}TimeBank{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col">
+            <h2>TimeBank Exchange</h2>
+        </div>
+        <div class="col-auto">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newOfferModal">
+                Create New Offer
+            </button>
+        </div>
+    </div>
+
+    {% if offers %}
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for offer in offers %}
+                <div class="col">
+                    <div class="card h-100 {% if offer.is_active %}border-success{% else %}border-secondary{% endif %}">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ offer.skill_offered }}</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">Offered by: {{ offer.user.username }}</h6>
+                            <p class="card-text">{{ offer.description }}</p>
+                            <p class="text-muted">Looking for: {{ offer.skill_needed }}</p>
+                        </div>
+                        <div class="card-footer">
+                            <button class="btn btn-outline-primary w-100" onclick="contactUser('{{ offer.user.username }}')">
+                                Contact User
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            No TimeBank offers available. Be the first to create one!
+        </div>
+    {% endif %}
+</div>
+
+<!-- New Offer Modal -->
+<div class="modal fade" id="newOfferModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create New TimeBank Offer</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="timebankForm">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="skillOffered" class="form-label">Skill You're Offering</label>
+                        <input type="text" class="form-control" id="skillOffered" name="skill_offered" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="skillNeeded" class="form-label">Skill You're Looking For</label>
+                        <input type="text" class="form-control" id="skillNeeded" name="skill_needed" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="submitTimeBank()">Create Offer</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function submitTimeBank() {
+    const form = document.getElementById('timebankForm');
+    const formData = new FormData(form);
+    
+    fetch('/api/timebank/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify(Object.fromEntries(formData))
+    })
+    .then(response => {
+        if (response.ok) {
+            location.reload();
+        } else {
+            throw new Error('Failed to create offer');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to create offer. Please try again.');
+    });
+}
+
+function contactUser(username) {
+    // Implement your contact functionality here
+    alert(`Contact functionality for ${username} will be implemented soon!`);
+}
+</script>
+{% endblock %} 

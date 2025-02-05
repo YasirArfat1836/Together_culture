@@ -1,0 +1,197 @@
+{% extends 'together_culture_app/base.html' %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <!-- Profile Information -->
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        {% if member_profile.profile_picture %}
+                            <img src="{{ member_profile.profile_picture.url }}" class="rounded-circle profile-picture" alt="Profile Picture">
+                        {% else %}
+                            <img src="/static/images/default-profile.png" class="rounded-circle profile-picture" alt="Default Profile Picture">
+                        {% endif %}
+                        <div class="mt-2">
+                            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#uploadPhotoModal">
+                                Change Photo
+                            </button>
+                        </div>
+                    </div>
+                    <h3 class="card-title text-center">{{ user.get_full_name }}</h3>
+                    <p class="text-muted text-center">@{{ user.username }}</p>
+                    <hr>
+                    <div class="mb-3">
+                        <h5>Member Information</h5>
+                        <p><strong>Member Type:</strong> {{ member_profile.get_member_type_display }}</p>
+                        <p><strong>Primary Interest:</strong> {{ member_profile.get_primary_interest_display }}</p>
+                        <p><strong>Join Date:</strong> {{ member_profile.join_date|date:"F j, Y" }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <h5>Bio</h5>
+                        <p>{{ member_profile.bio|default:"No bio provided yet." }}</p>
+                    </div>
+                    <button class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                        Edit Profile
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity Section -->
+        <div class="col-md-8">
+            <!-- Registered Events -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4 class="mb-0">My Events</h4>
+                </div>
+                <div class="card-body">
+                    {% if registered_events %}
+                        <div class="list-group">
+                            {% for attendance in registered_events %}
+                                <div class="list-group-item">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">{{ attendance.event.title }}</h5>
+                                        <small>{{ attendance.event.date|date:"F j, Y, g:i a" }}</small>
+                                    </div>
+                                    <p class="mb-1">{{ attendance.event.description|truncatewords:30 }}</p>
+                                    <small class="text-muted">
+                                        {% if attendance.attended %}
+                                            <span class="badge bg-success">Attended</span>
+                                        {% else %}
+                                            <span class="badge bg-warning">Not Attended</span>
+                                        {% endif %}
+                                    </small>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">You haven't registered for any events yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- TimeBank Activities -->
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">My TimeBank Activities</h4>
+                </div>
+                <div class="card-body">
+                    {% if timebank_offers %}
+                        <div class="list-group">
+                            {% for offer in timebank_offers %}
+                                <div class="list-group-item">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">{{ offer.skill_offered }}</h5>
+                                        <small>{{ offer.created_date|date:"F j, Y" }}</small>
+                                    </div>
+                                    <p class="mb-1">Looking for: {{ offer.skill_needed }}</p>
+                                    <p class="mb-1">{{ offer.description }}</p>
+                                    <small class="text-muted">
+                                        {% if offer.is_active %}
+                                            <span class="badge bg-success">Active</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Inactive</span>
+                                        {% endif %}
+                                    </small>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">You haven't created any TimeBank offers yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Profile Modal -->
+<div class="modal fade" id="editProfileModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Profile</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'update_profile' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="first_name" class="form-label">First Name</label>
+                        <input type="text" class="form-control" id="first_name" name="first_name" 
+                               value="{{ user.first_name }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="last_name" class="form-label">Last Name</label>
+                        <input type="text" class="form-control" id="last_name" name="last_name" 
+                               value="{{ user.last_name }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" 
+                               value="{{ user.email }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="bio" class="form-label">Bio</label>
+                        <textarea class="form-control" id="bio" name="bio" rows="3">{{ member_profile.bio }}</textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Upload Photo Modal -->
+<div class="modal fade" id="uploadPhotoModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Upload Profile Picture</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'upload_profile_picture' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="profile_picture" class="form-label">Choose Picture</label>
+                        <input type="file" class="form-control" id="profile_picture" name="profile_picture" accept="image/*" required>
+                    </div>
+                    <div id="imagePreview" class="text-center" style="display: none;">
+                        <img src="" alt="Preview" style="max-width: 200px; max-height: 200px;">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Upload</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Image preview functionality
+document.getElementById('profile_picture').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const preview = document.getElementById('imagePreview');
+            preview.style.display = 'block';
+            preview.querySelector('img').src = e.target.result;
+        }
+        reader.readAsDataURL(file);
+    }
+});
+</script>
+{% endblock %} 

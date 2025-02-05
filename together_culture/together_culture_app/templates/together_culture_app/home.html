@@ -1,0 +1,43 @@
+{% extends 'together_culture_app/base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="jumbotron text-center py-5 bg-light">
+    <h1 class="display-4">Welcome to Together Culture</h1>
+    <p class="lead">A community united in creating a more equitable and ecological creative economy.</p>
+    {% if not user.is_authenticated %}
+        <a href="{% url 'register' %}" class="btn btn-culture btn-lg">Join Our Community</a>
+    {% endif %}
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Upcoming Events</h5>
+                <p class="card-text">Discover and participate in our community events.</p>
+                <a href="{% url 'events' %}" class="btn btn-culture">View Events</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Digital Content</h5>
+                <p class="card-text">Access our library of digital resources and learning materials.</p>
+                <a href="{% url 'digital_content' %}" class="btn btn-culture">Browse Content</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">TimeBank</h5>
+                <p class="card-text">Exchange skills and services with community members.</p>
+                <a href="{% url 'timebank' %}" class="btn btn-culture">Visit TimeBank</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
