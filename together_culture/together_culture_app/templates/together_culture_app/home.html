@@ -1,43 +1,146 @@
 {% extends 'together_culture_app/base.html' %}
+{% load static %}
 
 {% block title %}Home{% endblock %}
 
 {% block content %}
-<div class="jumbotron text-center py-5 bg-light">
-    <h1 class="display-4">Welcome to Together Culture</h1>
-    <p class="lead">A community united in creating a more equitable and ecological creative economy.</p>
-    {% if not user.is_authenticated %}
-        <a href="{% url 'register' %}" class="btn btn-culture btn-lg">Join Our Community</a>
-    {% endif %}
+<!-- Hero Section with Video Background -->
+<div class="hero-section">
+    <div class="video-background">
+        <video autoplay muted loop id="myVideo">
+            <source src="{% static 'videos/video.mp4' %}" type="video/mp4">
+        </video>
+    </div>
+    <div class="hero-content">
+        <h1 class="animate__animated animate__fadeInDown">Welcome to Together Culture</h1>
+        <p class="lead animate__animated animate__fadeInUp animate__delay-1s">
+            A community united in creating a more equitable and ecological creative economy
+        </p>
+        {% if not user.is_authenticated %}
+            <div class="animate__animated animate__fadeInUp animate__delay-2s">
+                <a href="{% url 'register' %}" class="btn btn-culture btn-lg me-3">Join Our Community</a>
+                <a href="{% url 'login' %}" class="btn btn-outline-light btn-lg">Login</a>
+            </div>
+        {% endif %}
+    </div>
 </div>
 
-<div class="row mt-5">
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Upcoming Events</h5>
-                <p class="card-text">Discover and participate in our community events.</p>
-                <a href="{% url 'events' %}" class="btn btn-culture">View Events</a>
+<!-- Features Section -->
+<section class="features-section">
+    <div class="container">
+        <h2 class="text-center mb-5 section-title">What We Offer</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="feature-card" data-aos="fade-up">
+                    <div class="icon-wrapper">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <h3>Community Events</h3>
+                    <p>Join our diverse range of events designed to bring the community together and foster creativity.</p>
+                    <a href="{% url 'events' %}" class="btn btn-link">Explore Events →</a>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="icon-wrapper">
+                        <i class="fas fa-laptop"></i>
+                    </div>
+                    <h3>Digital Content</h3>
+                    <p>Access our curated collection of digital resources and learning materials.</p>
+                    <a href="{% url 'digital_content' %}" class="btn btn-link">Browse Content →</a>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="icon-wrapper">
+                        <i class="fas fa-exchange-alt"></i>
+                    </div>
+                    <h3>TimeBank Exchange</h3>
+                    <p>Share your skills and time with other community members in our TimeBank system.</p>
+                    <a href="{% url 'timebank' %}" class="btn btn-link">Join TimeBank →</a>
+                </div>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Digital Content</h5>
-                <p class="card-text">Access our library of digital resources and learning materials.</p>
-                <a href="{% url 'digital_content' %}" class="btn btn-culture">Browse Content</a>
+</section>
+
+<!-- Community Stats Section -->
+<section class="stats-section" data-aos="fade-up">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-4">
+                <div class="stat-item">
+                    <h3 class="counter">500+</h3>
+                    <p>Community Members</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-item">
+                    <h3 class="counter">100+</h3>
+                    <p>Monthly Events</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-item">
+                    <h3 class="counter">1000+</h3>
+                    <p>Hours Exchanged</p>
+                </div>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">TimeBank</h5>
-                <p class="card-text">Exchange skills and services with community members.</p>
-                <a href="{% url 'timebank' %}" class="btn btn-culture">Visit TimeBank</a>
+</section>
+
+<!-- Testimonials Section -->
+<section class="testimonials-section">
+    <div class="container">
+        <h2 class="text-center mb-5 section-title">Community Voices</h2>
+        <div class="testimonial-carousel">
+            <div class="testimonial-item" data-aos="fade-up">
+                <div class="testimonial-content">
+                    <p>"Together Culture has transformed how I connect with my local community. The TimeBank system is revolutionary!"</p>
+                    <div class="testimonial-author">
+                        <img src="{% static 'images/my_image.jpeg' %}" alt="Testimonial Author">
+                        <h4>Sarah Johnson</h4>
+                        <p>Community Member</p>
+                    </div>
+                </div>
             </div>
+            <!-- Add more testimonials as needed -->
         </div>
     </div>
-</div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script>
+    AOS.init({
+        duration: 800,
+        once: true
+    });
+
+    // Counter animation
+    const counters = document.querySelectorAll('.counter');
+    counters.forEach(counter => {
+        const target = +counter.innerText.replace('+', '');
+        const count = 0;
+        const increment = target / 60;
+        
+        function updateCount() {
+            const c = +counter.innerText.replace('+', '');
+            if (c < target) {
+                counter.innerText = Math.ceil(c + increment) + '+';
+                setTimeout(updateCount, 30);
+            }
+        }
+        
+        updateCount();
+    });
+</script>
 {% endblock %} 
